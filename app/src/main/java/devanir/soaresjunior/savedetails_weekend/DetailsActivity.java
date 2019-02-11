@@ -1,6 +1,8 @@
 package devanir.soaresjunior.savedetails_weekend;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -19,39 +21,36 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        TextView tvSubmit = findViewById(R.id.tvSubmit);
 
-        TextView tvAgeIntent = findViewById(R.id.tvAgeIntent);
-        Intent intent = getIntent();
-        String age = intent.getStringExtra("Age");
-        tvAgeIntent.setText(age);
+        String age = getIntent().getStringExtra("submission");
+        String name = readDataFromFile();
+        String email = readFromSharedPreference();
+        String info = "Name: " + name + "\n" + "Age: " + age + "\n" + "Email: " + email;
+        tvSubmit.setText(info);
 
-        TextView tvLogs = findViewById(R.id.tvSubmit);
 
-        ArrayList<String> logs =
-                getIntent().getStringArrayListExtra("submission");
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i <logs.size(); i++){
-            stringBuilder.append(logs.get(i));
-            stringBuilder.append("\n");
-
-        }
-
-        tvLogs.setText(readDataFromFile());
     }
-    private String readDataFromFile(){
+
+    private String readDataFromFile() {
         File file = new File(getFilesDir(), "Submission.txt");
         int size = (int) file.length();
         byte[] contents = new byte[size];
-        try (FileInputStream fileInputStream = new FileInputStream(file)){
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
             fileInputStream.read(contents);
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return new String(contents);
 
     }
 
+    private String readFromSharedPreference() {
+        SharedPreferences sharedPreferences = getSharedPreferences("submission", Context.MODE_PRIVATE);
+        String email = sharedPreferences.getString("submission", "");
+        return email;
     }
+}
 
 
 

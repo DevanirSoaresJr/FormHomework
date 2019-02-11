@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-//Declaring Views
+    //Declaring Views
     Button btnSubmit;
     TextView tvName;
     TextView tvAge;
@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     EditText etEmail;
     TextView tvSubmit;
 
-//Creating ArrayList
-    private List<String> submission = new ArrayList<>();
+    //Creating ArrayList
+   // private List<String> submission = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,59 +50,45 @@ public class MainActivity extends AppCompatActivity {
 //Setting Click Listener to btnSubmit
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
-                public void onClick(View v) {
-                //creating a String to store the values of the Edittexts
-                String sub = (etName.getText().toString() + "\n" + etAge.getText().toString() + "\n" + etEmail.getText().toString());
-                //adding the string to the array list
-                submission.add(sub);
-                //array list is now bigger then 0 there's more than one position so, a method to write this logs to file with execute
-                if (submission.size()>0){
-                    writeLogsToFile();
-
-                }
+            public void onClick(View v) {
+                String age = etAge.getText().toString();
                 //Getting Shared preferences, which works with key value pairs.
                 SharedPreferences sharedPreferences = getSharedPreferences("submission", Context.MODE_PRIVATE);
-
-                //getting the shared preferences editor to work
-                String save = sharedPreferences.getString("submission", "");
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("submission", etEmail.getText().toString());
                 editor.apply();
-                Toast.makeText(MainActivity.this,"Saved Successfully", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(MainActivity.this, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                writeNameToFile();
 
                 Intent intent = new Intent
                         (MainActivity.this, DetailsActivity.class);
-                intent.putStringArrayListExtra("submission",
-                        (ArrayList<String>) submission);
+                intent.putExtra("submission",
+                        age);
                 startActivity(intent);
-                
 
+                //creating a String to store the values of the Edittexts
+                //String sub = (etName.getText().toString() + "\n" + etAge.getText().toString() + "\n" + etEmail.getText().toString());
+                //adding the string to the array list
+                //submission.add(sub);
+                //array list is now bigger then 0 there's more than one position so, a method to write this logs to file with execute
+                // if (submission.size()>0){
+                //   writeLogsToFile();
+
+            }
+
+            private void writeNameToFile() {
+                File file = new File(getFilesDir(), "Submission.txt");
+                try (FileOutputStream fileOutputStream = openFileOutput("Submission.txt", Context.MODE_PRIVATE)) {
+
+                    fileOutputStream.write(etName.getText().toString().getBytes());
+
+                } catch (IOException ioxception) {
+                    Toast.makeText(MainActivity.this, "File Not Found", Toast.LENGTH_SHORT).show();
+                    ioxception.printStackTrace();
+
+                }
             }
         });
-
-
-
-
-
     }
-    private void writeLogsToFile() {
-        File file = new File(getFilesDir(), "Submission.txt");
-        //FileOutputStream fileOutputStream = null;
+}
 
-        try (FileOutputStream fileOutputStream = openFileOutput("Submission.txt", Context.MODE_PRIVATE)) {
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String result : submission) {
-                stringBuilder.append(result);
-                stringBuilder.append("\n");
-
-
-            }
-            fileOutputStream.write(stringBuilder.toString().getBytes());
-        } catch (IOException ioxception) {
-            Toast.makeText(this, "File Not Found", Toast.LENGTH_SHORT).show();
-            ioxception.printStackTrace();
-
-        }
-}}
